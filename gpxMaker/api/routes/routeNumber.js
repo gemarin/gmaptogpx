@@ -1,17 +1,11 @@
 // api/routes/routeNumber.js
 import express from "express";
-import { scrapeGPX } from "../server/gpxScraper.js";
-import { URL } from "url";
+import { scrapeGPX } from "../scripts/gpxScraper.js";
 
 const router = express.Router();
 
 router.get("/gpx/:route", async (req, res) => {
-  console.log(
-    "!!!!!Received request for GPX route:",
-    req.params,
-    req.params.route
-  );
-  console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+  console.log(req.params, req.params.route);
   const routeRValue = req.url.includes("www")
     ? req.url.split("=")[1]
     : req.params.route;
