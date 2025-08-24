@@ -7,12 +7,12 @@ import {
   Heading,
   Text,
   Container,
-  Flex,
   Link,
 } from "@chakra-ui/react";
+import { MdDownloadDone } from "react-icons/md";
+
 import { FormControl } from "@chakra-ui/form-control";
 import React, { FormEvent, ChangeEvent, useState } from "react";
-import { CheckIcon } from "@chakra-ui/icons";
 
 export default function Converter() {
   const [routeNumber, setRouteNumber] = useState("");
@@ -105,7 +105,7 @@ export default function Converter() {
             bgColor={"blue.500"}
             type={state === "success" ? "button" : "submit"}
           >
-            {state === "success" ? <CheckIcon /> : "Generate GPX"}
+            {state === "success" ? <MdDownloadDone /> : "Generate GPX"}
           </Button>
         </FormControl>
 

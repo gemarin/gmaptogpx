@@ -1,7 +1,14 @@
 "use client";
 
-import { Box, Flex, HStack, Button, Heading, Stack } from "@chakra-ui/react";
-import { Icon } from "@chakra-ui/icons";
+import {
+  Box,
+  Flex,
+  HStack,
+  Button,
+  Heading,
+  Stack,
+  Icon,
+} from "@chakra-ui/react";
 import { FaHandHoldingHeart } from "react-icons/fa";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import React from "react";
