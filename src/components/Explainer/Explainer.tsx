@@ -17,16 +17,18 @@ const headerAndDescription = [
     header: "Download",
     description: "The GPX file will automatically download for you.",
   },
-  {
-    header: "Note",
-    description:
-      "This tool only works with public routes from gmap-pedometer.com. The conversion process uses browser automation to extract the route data. Please be patient as this may take a few seconds.",
-  },
 ];
 
 export default function Explainer() {
   return (
-    <Container maxW={"lg"} bg={"white"} boxShadow={"xl"} rounded={"lg"} p={6}>
+    <Container
+      maxW={"lg"}
+      maxH={"lg"}
+      bg={"white"}
+      boxShadow={"xl"}
+      rounded={"lg"}
+      p={6}
+    >
       <Heading
         as={"h2"}
         fontSize={{ base: "xl", sm: "2xl" }}
@@ -41,7 +43,7 @@ export default function Explainer() {
             <Heading as={"h4"} fontSize={"lg"} mb={2}>
               {item.header}
             </Heading>
-            <Text mt={2} color={"gray.500"}>
+            <Text mt={2} fontSize={"md"} color={"gray.500"}>
               {item.description}
             </Text>
           </Stack>

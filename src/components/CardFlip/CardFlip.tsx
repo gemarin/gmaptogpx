@@ -57,6 +57,7 @@ function CardFlip() {
           position="absolute"
           backfaceVisibility="hidden"
           color={textColor}
+          width="100%"
           p="4"
           borderRadius="md"
           boxShadow="md"
