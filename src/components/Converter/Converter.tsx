@@ -39,8 +39,6 @@ export default function Converter() {
       setState("error");
     } finally {
       setState("initial");
-      //TODO: set a popup success alert
-      console.log("GPX download completed");
     }
   };
 
@@ -56,7 +54,7 @@ export default function Converter() {
         textAlign={"center"}
         mb={5}
       >
-        Enter a GMAP Pedometer URL or Route Number to convert it to GPX format.
+        Enter a GMAP Pedometer Route Number to convert it to GPX format.
       </Heading>
       <Stack
         direction={{ base: "column", md: "column" }}
