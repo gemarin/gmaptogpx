@@ -23,6 +23,7 @@ function CardFlip() {
       width="500px"
       height="600px"
       position="relative"
+      mt={10}
       onClick={handleFlip}
       style={{
         perspective: "1000px",

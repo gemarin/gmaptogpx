@@ -3,7 +3,7 @@ import React from "react";
 import CardFlip from "../components/CardFlip/CardFlip";
 
 export const MainPage = () => (
-  <VStack>
+  <VStack bgColor={"transparent"}>
     <CardFlip />
   </VStack>
 );

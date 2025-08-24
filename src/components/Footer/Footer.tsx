@@ -8,35 +8,38 @@ import {
   Heading,
   Stack,
   Icon,
+  Link,
 } from "@chakra-ui/react";
-import { FaHandHoldingHeart } from "react-icons/fa";
+import { FaPenNib } from "react-icons/fa";
 import { FaGithub } from "react-icons/fa";
 import React from "react";
 
 export default function Footer() {
   return (
     <>
-      <Box bg={"gray.100"} px={4}>
+      <Box
+        bg={"gray.100"}
+        position={"fixed"}
+        left={0}
+        bottom={0}
+        width={"100%"}
+        px={4}
+      >
         <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
           <Box>
             <HStack borderSpacing={23} alignItems={"center"}>
               {<Icon as={FaGithub} />}
-              <Heading size="2xl">GitHub repo</Heading>
+              <Link href="https://github.com/gemarin/gmaptogpx">Repo</Link>
             </HStack>
           </Box>
 
           <Flex alignItems={"center"}>
-            <Stack direction={"row"} wordSpacing={7}>
+            <Stack direction={"row"}>
               <Flex alignItems={"center"}>
-                <Button
-                  variant={"solid"}
-                  bgColor={"blue.600"}
-                  size={"sm"}
-                  mr={4}
-                >
-                  {<Icon as={FaHandHoldingHeart} />}
-                  Enjoy This Tool? Consider Donating!
-                </Button>
+                <Link href="https://www.linkedin.com/in/gaby-marin/">
+                  {<Icon as={FaPenNib} />}
+                  Created By Gaby Marin
+                </Link>
               </Flex>
             </Stack>
           </Flex>

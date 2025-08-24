@@ -16,12 +16,12 @@ import React from "react";
 export default function Header() {
   return (
     <>
-      <Box bg={"gray.100"} px={4}>
+      <Box bg={"gray.100"} px={4} position="fixed" width="100%" top={0}>
         <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
           <Box>
             <HStack borderSpacing={23} alignItems={"center"}>
               {<Icon as={FaMapMarkerAlt} />}
-              <Heading size="2xl">GMAP to GPX Generator</Heading>
+              <Heading size="2xl">RouteSync</Heading>
             </HStack>
           </Box>
 
@@ -33,6 +33,12 @@ export default function Header() {
                   bgColor={"blue.600"}
                   size={"sm"}
                   mr={4}
+                  onClick={() => {
+                    window.open(
+                      "https://www.gofundme.com/f/run-for-nature-help-conservation-international",
+                      "_blank"
+                    );
+                  }}
                 >
                   {<Icon as={FaHandHoldingHeart} />}
                   Enjoy This Tool? Consider Donating!

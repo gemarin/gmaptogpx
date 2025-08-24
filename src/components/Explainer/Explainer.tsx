@@ -14,7 +14,7 @@ const headerAndDescription = [
       "The app loads the route page, extracts the actual route coordinates and elevation data, and converts them into standard GPX format with all required metadata.",
   },
   {
-    header: "Download or Copy",
+    header: "Download",
     description: "The GPX file will automatically download for you.",
   },
   {
