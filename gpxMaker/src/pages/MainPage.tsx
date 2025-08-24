@@ -1,15 +1,9 @@
-import { Container, Flex, Stack } from "@chakra-ui/react";
-import Converter from "../components/Converter";
+import { Container, Flex, HStack, Stack, VStack } from "@chakra-ui/react";
 import React from "react";
-import Explainer from "../components/Explainer";
+import CardFlip from "../components/CardFlip/CardFlip";
 
-export const MainPage = () => {
-  return (
-    <Stack direction={{ base: "column", md: "column-reverse" }}>
-      <Flex minH={"100vh"} align={"center"} justify={"center"} bg={"gray.50"}>
-        <Converter />
-        <Explainer />
-      </Flex>
-    </Stack>
-  );
-};
+export const MainPage = () => (
+  <VStack>
+    <CardFlip />
+  </VStack>
+);

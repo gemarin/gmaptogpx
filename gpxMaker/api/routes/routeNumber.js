@@ -5,16 +5,12 @@ import { scrapeGPX } from "../scripts/gpxScraper.js";
 const router = express.Router();
 
 router.get("/gpx/:route", async (req, res) => {
-  console.log(req.params, req.params.route);
   const routeRValue = req.url.includes("www")
     ? req.url.split("=")[1]
     : req.params.route;
-  console.log("routeRValue", routeRValue);
 
   try {
     const isValid = !!parseInt(routeRValue);
-
-    console.log("isValid", isValid);
 
     if (!isValid) {
       return res.status(403).send("URL not allowed");

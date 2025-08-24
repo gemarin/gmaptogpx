@@ -8,15 +8,11 @@ import {
   Text,
   Container,
   Flex,
+  Link,
 } from "@chakra-ui/react";
 import { FormControl } from "@chakra-ui/form-control";
 import React, { FormEvent, ChangeEvent, useState } from "react";
 import { CheckIcon } from "@chakra-ui/icons";
-import { HiOutlineMapPin } from "react-icons/hi2";
-
-interface Props {
-  children: React.ReactNode;
-}
 
 export default function Converter() {
   const [routeNumber, setRouteNumber] = useState("");
@@ -49,7 +45,7 @@ export default function Converter() {
   };
 
   const validInput = (input: string) => {
-    if (input.includes("https")) return false;
+    if (input) return false;
   };
 
   return (
@@ -60,29 +56,24 @@ export default function Converter() {
         textAlign={"center"}
         mb={5}
       >
-        Enter a Gmap Pedometer Url or Route Number to convert it to GPX format
-        that can be used with GPS devices and mapping applications.
+        Enter a GMAP Pedometer URL or Route Number to convert it to GPX format.
       </Heading>
       <Stack
         direction={{ base: "column", md: "column" }}
         as={"form"}
-        // spacing={"12px"}
         onSubmit={(e: FormEvent) => {
           e.preventDefault();
           setError(false);
           setState("submitting");
 
-          // remove this code and implement your submit logic right here
           try {
             setTimeout(() => {
-              // if (email === "fail@example.com") {
-              //   setError(true);
-              //   setState("initial");
-              //   return;
-              // }
               downloadGPX();
             }, 1000);
-          } catch (e) {}
+          } catch (e) {
+            setError(true);
+            setState("error");
+          }
         }}
       >
         <FormControl>
@@ -117,12 +108,14 @@ export default function Converter() {
             {state === "success" ? <CheckIcon /> : "Generate GPX"}
           </Button>
         </FormControl>
+
+        <Text mt={2} justifyContent={"center"} color={"red.500"}>
+          {error ?? "Oh no an error occured! 😢 Please try again later."}
+        </Text>
+        <Link justifyContent={"center"} color={"gray.500"}>
+          Click Here to Learn How it Works!
+        </Link>
       </Stack>
-      <Text mt={2} textAlign={"center"} color={error ? "red.500" : "gray.500"}>
-        {error
-          ? "Oh no an error occured! 😢 Please try again later."
-          : "Example: wwww.gmap-pedometer.com/?r=1234567 or 1234567."}
-      </Text>
     </Container>
   );
 }

@@ -3,18 +3,18 @@
 import { Box, Flex, HStack, Button, Heading, Stack } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/icons";
 import { FaHandHoldingHeart } from "react-icons/fa";
-import { FaMapMarkerAlt } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
 import React from "react";
 
-export default function Header() {
+export default function Footer() {
   return (
     <>
       <Box bg={"gray.100"} px={4}>
         <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
           <Box>
             <HStack borderSpacing={23} alignItems={"center"}>
-              {<Icon as={FaMapMarkerAlt} />}
-              <Heading size="2xl">GMAP to GPX Generator</Heading>
+              {<Icon as={FaGithub} />}
+              <Heading size="2xl">GitHub repo</Heading>
             </HStack>
           </Box>
 
