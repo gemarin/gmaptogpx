@@ -11,8 +11,7 @@
     "gpx": "node ./src/gmapToGpx.js"
   },
   "dependencies": {
-    "@chakra-ui/icons": "^2.2.4",
-    "@chakra-ui/react": "^3.19.0",
+    "@chakra-ui/react": "^3.25.0",
     "@emotion/react": "^11.14.0",
     "axios": "^1.9.0",
     "cors": "^2.8.5",
