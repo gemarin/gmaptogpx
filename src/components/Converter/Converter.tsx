@@ -42,9 +42,9 @@ export default function Converter() {
     }
   };
 
-  const validInput = (input: string) => {
-    if (input) return false;
-  };
+  // const validInput = (input: string) => {
+  //   if (input) return false;
+  // };
 
   return (
     <Container maxW={"lg"} bg={"white"} boxShadow={"xl"} rounded={"lg"} p={6}>
