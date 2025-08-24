@@ -23,23 +23,65 @@ export default function PipelineBackground() {
       }
       window.addEventListener("resize", resize);
 
+      // Initialize particles
+      const PARTICLE_COUNT = 200;
+      const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 100 + 50,
+        vx: 0,
+        vy: 0,
+        hue: Math.random() * 60 + 200, // Range from 200-260 (blues)
+      }));
+
       function draw() {
         if (!ctx) return;
-        ctx.fillStyle = "rgba(0, 0, 0, 0.1)"; // background fade
+
+        ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
         ctx.fillRect(0, 0, width, height);
 
-        ctx.strokeStyle = "rgba(0, 200, 255, 0.5)";
-        ctx.beginPath();
+        // Update and draw particles
+        particles.forEach((p) => {
+          // Use noise to create flowing movement
+          const angle =
+            noise2D(p.x / 1000, p.y / 1000 + time / 1500) * Math.PI * 2;
+          const speed = 0.15;
 
-        for (let x = 0; x < width; x += 10) {
-          const y = height / 2 + noise2D(x / 200, time / 200) * 100; // noisy line
+          // Update velocity with smooth acceleration
+          p.vx = p.vx * 0.95 + Math.cos(angle) * speed;
+          p.vy = p.vy * 0.95 + Math.sin(angle) * speed;
 
-          if (x === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
+          // Update position
+          p.x += p.vx;
+          p.y += p.vy;
 
-        ctx.stroke();
-        time += 2;
+          // Wrap around edges
+          if (p.x < -p.radius) p.x = width + p.radius;
+          if (p.x > width + p.radius) p.x = -p.radius;
+          if (p.y < -p.radius) p.y = height + p.radius;
+          if (p.y > height + p.radius) p.y = -p.radius;
+
+          // Draw coalescing particle with shifted gradient
+          const gradient = ctx.createRadialGradient(
+            p.x,
+            p.y,
+            p.radius * 0.25, // Inner radius at 25% of particle radius
+            p.x,
+            p.y,
+            p.radius
+          );
+          gradient.addColorStop(0, `hsla(${p.hue}, 100%, 20%, 0.4)`);
+          gradient.addColorStop(0.1, `hsla(${p.hue}, 100%, 17%, 0.3)`);
+          gradient.addColorStop(0.5, `hsla(${p.hue}, 100%, 12%, 0.2)`);
+          gradient.addColorStop(1, `hsla(${p.hue}, 100%, 10%, 0)`);
+
+          ctx.beginPath();
+          ctx.fillStyle = gradient;
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        time += 1;
         requestAnimationFrame(draw);
       }
 
