@@ -19,7 +19,7 @@ app.get("*", (req, res) => {
 });
 
 const PORT = process.env.PORT || 9001;
-const HOST = "0.0.0.0"; // required on Render
+const HOST = "0.0.0.0"; // required on Render to host
 
 app.listen(PORT, HOST, () => {
   console.log(`Server running on http://${HOST}:${PORT}`);
