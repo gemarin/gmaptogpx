@@ -1,42 +1,24 @@
-import createError from "http-errors";
-import express from "express";
 import path from "path";
-import cookieParser from "cookie-parser";
-import logger from "morgan";
-import cors from "cors";
+import { fileURLToPath } from "url";
+import express from "express";
 
-import indexRouter from "./routes/index.js";
-
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
-// view engine setup
-app.set("views", path.join(process.cwd(), "views"));
-app.set("view engine", "jade");
+// Serve React build
+app.use(express.static(path.join(__dirname, "dist")));
 
-app.use(logger("dev"));
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(process.cwd(), "public")));
-
-app.use("/", indexRouter);
-
-// error handler
-app.use(function (err, req, res, next) {
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
-  res.status(err.status || 500);
-  res.render("error");
-});
-
-app.listen(0, () => {
-  app.set("port", 63431); // Store in app context
-  console.log(`Server running on port 63431`);
-});
-
+// API route
 app.get("/config", (req, res) => {
-  res.json({ apiPort: 63431 });
+  res.json({ apiPort: process.env.PORT || 9001 });
 });
 
-export default app;
+// Catch-all to serve frontend for any non-API route
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
+
+const PORT = process.env.PORT || 9001;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
