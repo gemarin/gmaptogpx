@@ -19,11 +19,12 @@ export default function Converter() {
   const [state, setState] = useState<
     "initial" | "submitting" | "success" | "error"
   >("initial");
+  const API_BASE = "https://gmaptogpx.onrender.com";
   const [error, setError] = useState(false);
 
   const downloadGPX = async () => {
     try {
-      const res = await fetch(`http://localhost:63431/api/gpx/${routeNumber}`);
+      const res = await fetch(`${API_BASE}/api/gpx/${routeNumber}`);
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
 

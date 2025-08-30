@@ -11,5 +11,5 @@ export async function loadConfig() {
 
 export function getApiUrl() {
   if (!config) throw new Error("API config not loaded");
-  return `http://localhost:${config.apiPort}`;
+  return `http://${API_BASE}:${config.apiPort}`;
 }
