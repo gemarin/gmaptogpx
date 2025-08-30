@@ -1,8 +1,5 @@
 let config = null;
-const API_BASE =
-  "https://gmaptogpx.onrender.com" ||
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:9001";
+const API_BASE = "https://gmaptogpx.onrender.com";
 
 export async function loadConfig() {
   const res = await fetch(`${API_BASE}/config`);
@@ -11,5 +8,5 @@ export async function loadConfig() {
 
 export function getApiUrl() {
   if (!config) throw new Error("API config not loaded");
-  return `http://${API_BASE}:${config.apiPort}`;
+  return `${API_BASE}:${config.apiPort}`;
 }
