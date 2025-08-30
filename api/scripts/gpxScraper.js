@@ -4,7 +4,14 @@ export async function scrapeGPX(routeNumber) {
   const url = new URL(`https://www.gmap-pedometer.com/?r=${routeNumber}`);
   const browser = await launch({
     headless: "new",
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-gpu",
+      "--single-process",
+      "--no-zygote"
+    ],
   });
   const page = await browser.newPage();
 
