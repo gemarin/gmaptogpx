@@ -58,8 +58,8 @@ export async function scrapeGPX(routeNumber) {
 
   const trackpoints = await page.evaluate(() =>
     window.gLatLngArray.map((p) => ({
-      lat: p.lat,
-      lon: p.lng,
+      lat: typeof p.lat === "function" ? p.lat() : p.lat,
+      lon: typeof p.lng === "function" ? p.lng() : p.lng,
       ele: p.ele || null,
     }))
   );
