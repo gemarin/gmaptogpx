@@ -1,8 +1,11 @@
-import { launch } from "puppeteer";
+import puppeteer from "puppeteer-extra";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
+
+puppeteer.use(StealthPlugin());
 
 export async function scrapeGPX(routeNumber) {
   const url = new URL(`https://www.gmap-pedometer.com/?r=${routeNumber}`);
-  const browser = await launch({
+  const browser = await puppeteer.launch({
     headless: "new",
     args: [
       "--no-sandbox",
@@ -20,15 +23,14 @@ export async function scrapeGPX(routeNumber) {
       "AppleWebKit/537.36 (KHTML, like Gecko) " +
       "Chrome/119.0.0.0 Safari/537.36"
   );
+
   await page.setViewport({ width: 1280, height: 800 });
   await page.evaluateOnNewDocument(() => {
     Object.defineProperty(navigator, "webdriver", { get: () => false });
     Object.defineProperty(navigator, "languages", {
       get: () => ["en-US", "en"],
     });
-    Object.defineProperty(navigator, "plugins", {
-      get: () => [1, 2, 3, 4, 5], // fake plugins
-    });
+    Object.defineProperty(navigator, "plugins", { get: () => [1, 2, 3, 4, 5] });
   });
   await page.goto(url, { waitUntil: "domcontentloaded" });
 
