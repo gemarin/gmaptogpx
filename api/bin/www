@@ -9,7 +9,7 @@ const debug = debugLib("api:server");
 /**
  * Get port from environment and store in Express.
  */
-const port = normalizePort("63431");
+const port = normalizePort(process.env.PORT || "63431");
 app.set("port", port);
 
 /**
