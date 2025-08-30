@@ -47,10 +47,16 @@ export async function scrapeGPX(routeNumber) {
     );
   } catch (err) {
     // Log the page HTML for debugging
-    const html = await page.content();
+
+    const exists = await page.evaluate(
+      () => typeof window.gLatLngArray !== "undefined"
+    );
+    const length = await page.evaluate(() => window.gLatLngArray?.length || 0);
     console.error(
-      "GPX generation failed: Timeout waiting for route data. Page HTML:",
-      html
+      "❌ gLatLngArray check failed. Exists?",
+      exists,
+      "Length:",
+      length
     );
     await browser.close();
     throw err;
