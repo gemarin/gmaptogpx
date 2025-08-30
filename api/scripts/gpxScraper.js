@@ -18,7 +18,7 @@ export async function scrapeGPX(routeNumber) {
       );
     },
     {
-      timeout: 10000, // wait up to 10 seconds
+      timeout: 60000, // wait up to 1 minute
       polling: 500, // check every 0.5 seconds
     }
   );
