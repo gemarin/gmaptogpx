@@ -39,12 +39,6 @@ app.use(function (err, req, res, next) {
   res.render("error");
 });
 
-// Only start the server if this file is run directly
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
-
 app.get("/config", (req, res) => {
   res.json({ apiPort: process.env.PORT || 3000 });
 });
