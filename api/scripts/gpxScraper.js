@@ -10,25 +10,36 @@ export async function scrapeGPX(routeNumber) {
       "--disable-dev-shm-usage",
       "--disable-gpu",
       "--single-process",
-      "--no-zygote"
+      "--no-zygote",
     ],
   });
   const page = await browser.newPage();
 
   await page.goto(url, { waitUntil: "networkidle2" });
 
-  await page.waitForFunction(
-    () => {
-      return (
-        typeof window.gLatLngArray !== "undefined" &&
-        window.gLatLngArray.length > 0
-      );
-    },
-    {
-      timeout: 60000, // wait up to 1 minute
-      polling: 500, // check every 0.5 seconds
-    }
-  );
+  try {
+    await page.waitForFunction(
+      () => {
+        return (
+          typeof window.gLatLngArray !== "undefined" &&
+          window.gLatLngArray.length > 0
+        );
+      },
+      {
+        timeout: 60000, // wait up to 1 minute
+        polling: 500, // check every 0.5 seconds
+      }
+    );
+  } catch (err) {
+    // Log the page HTML for debugging
+    const html = await page.content();
+    console.error(
+      "GPX generation failed: Timeout waiting for route data. Page HTML:",
+      html
+    );
+    await browser.close();
+    throw err;
+  }
 
   const trackpoints = await page.evaluate(() =>
     window.gLatLngArray.map((p) => ({
