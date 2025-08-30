@@ -20,8 +20,17 @@ export async function scrapeGPX(routeNumber) {
       "AppleWebKit/537.36 (KHTML, like Gecko) " +
       "Chrome/119.0.0.0 Safari/537.36"
   );
-
-  await page.goto(url, { waitUntil: "networkidle2" });
+  await page.setViewport({ width: 1280, height: 800 });
+  await page.evaluateOnNewDocument(() => {
+    Object.defineProperty(navigator, "webdriver", { get: () => false });
+    Object.defineProperty(navigator, "languages", {
+      get: () => ["en-US", "en"],
+    });
+    Object.defineProperty(navigator, "plugins", {
+      get: () => [1, 2, 3, 4, 5], // fake plugins
+    });
+  });
+  await page.goto(url, { waitUntil: "domcontentloaded" });
 
   try {
     await page.waitForFunction(
