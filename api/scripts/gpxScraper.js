@@ -4,7 +4,7 @@ import StealthPlugin from "puppeteer-extra-plugin-stealth";
 puppeteer.use(StealthPlugin());
 
 export async function scrapeGPX(routeNumber) {
-  const url = new URL(`https://www.gmap-pedometer.com/?r=${routeNumber}`);
+  const url = `https://www.gmap-pedometer.com/?r=${routeNumber}`;
   const browser = await puppeteer.launch({
     headless: "new",
     args: [
@@ -32,65 +32,28 @@ export async function scrapeGPX(routeNumber) {
     });
     Object.defineProperty(navigator, "plugins", { get: () => [1, 2, 3, 4, 5] });
   });
+
   await page.goto(url, { waitUntil: "domcontentloaded" });
-  for (let i = 0; i < 10; i++) {
-    const length = await page.evaluate(() => window.gLatLngArray?.length || 0);
-    console.error(`🔎 Iteration ${i}: gLatLngArray length =`, length);
-    await new Promise((r) => setTimeout(r, 2000)); // wait 2s
+
+  // Find the right frame that contains gLatLngArray
+  const targetFrame = page
+    .frames()
+    .find((f) => f.url().includes(`gmap-pedometer.com/?r=${routeNumber}`));
+
+  if (!targetFrame) {
+    throw new Error("❌ Could not find gmap-pedometer route frame");
   }
 
-  for (const frame of page.frames()) {
-    const hasKey = await frame.evaluate(() => "gLatLngArray" in window);
-    console.error(`Frame URL: ${frame.url()} -> has gLatLngArray? ${hasKey}`);
-  }
-
-  page.on("console", (msg) => console.log("📜 BROWSER:", msg.text()));
-
-  // then inside evaluate
-  await page.evaluate(() => {
-    console.log(
-      "Inside browser. gLatLngArray length:",
-      window.gLatLngArray?.length
-    );
-  });
-  await page.waitForTimeout(10000); // wait 10s
-  const exists = await page.evaluate(
-    () => typeof window.gLatLngArray !== "undefined"
+  // Wait until gLatLngArray is populated
+  await targetFrame.waitForFunction(
+    () =>
+      typeof window.gLatLngArray !== "undefined" &&
+      window.gLatLngArray.length > 0,
+    { timeout: 60000, polling: 500 }
   );
-  const length = await page.evaluate(() => window.gLatLngArray?.length || 0);
-  console.log("✅ Exists:", exists, "Length:", length);
 
-  // try {
-  //   await page.waitForFunction(
-  //     () => {
-  //       return (
-  //         typeof window.gLatLngArray !== "undefined" &&
-  //         window.gLatLngArray.length > 0
-  //       );
-  //     },
-  //     {
-  //       timeout: 60000, // wait up to 1 minute
-  //       polling: 500, // check every 0.5 seconds
-  //     }
-  //   );
-  // } catch (err) {
-  //   // Log the page HTML for debugging
-
-  //   const exists = await page.evaluate(
-  //     () => typeof window.gLatLngArray !== "undefined"
-  //   );
-  //   const length = await page.evaluate(() => window.gLatLngArray?.length || 0);
-  //   console.error(
-  //     "❌ gLatLngArray check failed. Exists?",
-  //     exists,
-  //     "Length:",
-  //     length
-  //   );
-  //   await browser.close();
-  //   throw err;
-  // }
-
-  const trackpoints = await page.evaluate(() =>
+  // Extract trackpoints
+  const trackpoints = await targetFrame.evaluate(() =>
     window.gLatLngArray.map((p) => ({
       lat: typeof p.lat === "function" ? p.lat() : p.lat,
       lon: typeof p.lng === "function" ? p.lng() : p.lng,
@@ -99,7 +62,6 @@ export async function scrapeGPX(routeNumber) {
   );
 
   const gpx = generateGPX(routeNumber, trackpoints);
-
   await browser.close();
   return gpx;
 }
