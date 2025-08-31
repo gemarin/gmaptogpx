@@ -33,36 +33,57 @@ export async function scrapeGPX(routeNumber) {
     Object.defineProperty(navigator, "plugins", { get: () => [1, 2, 3, 4, 5] });
   });
   await page.goto(url, { waitUntil: "domcontentloaded" });
-
-  try {
-    await page.waitForFunction(
-      () => {
-        return (
-          typeof window.gLatLngArray !== "undefined" &&
-          window.gLatLngArray.length > 0
-        );
-      },
-      {
-        timeout: 60000, // wait up to 1 minute
-        polling: 500, // check every 0.5 seconds
-      }
-    );
-  } catch (err) {
-    // Log the page HTML for debugging
-
-    const exists = await page.evaluate(
-      () => typeof window.gLatLngArray !== "undefined"
-    );
+  for (let i = 0; i < 10; i++) {
     const length = await page.evaluate(() => window.gLatLngArray?.length || 0);
-    console.error(
-      "❌ gLatLngArray check failed. Exists?",
-      exists,
-      "Length:",
-      length
-    );
-    await browser.close();
-    throw err;
+    console.error(`🔎 Iteration ${i}: gLatLngArray length =`, length);
+    await new Promise((r) => setTimeout(r, 2000)); // wait 2s
   }
+
+  page.on("console", (msg) => console.log("📜 BROWSER:", msg.text()));
+
+  // then inside evaluate
+  await page.evaluate(() => {
+    console.log(
+      "Inside browser. gLatLngArray length:",
+      window.gLatLngArray?.length
+    );
+  });
+  await page.waitForTimeout(10000); // wait 10s
+  const exists = await page.evaluate(
+    () => typeof window.gLatLngArray !== "undefined"
+  );
+  const length = await page.evaluate(() => window.gLatLngArray?.length || 0);
+  console.log("✅ Exists:", exists, "Length:", length);
+
+  // try {
+  //   await page.waitForFunction(
+  //     () => {
+  //       return (
+  //         typeof window.gLatLngArray !== "undefined" &&
+  //         window.gLatLngArray.length > 0
+  //       );
+  //     },
+  //     {
+  //       timeout: 60000, // wait up to 1 minute
+  //       polling: 500, // check every 0.5 seconds
+  //     }
+  //   );
+  // } catch (err) {
+  //   // Log the page HTML for debugging
+
+  //   const exists = await page.evaluate(
+  //     () => typeof window.gLatLngArray !== "undefined"
+  //   );
+  //   const length = await page.evaluate(() => window.gLatLngArray?.length || 0);
+  //   console.error(
+  //     "❌ gLatLngArray check failed. Exists?",
+  //     exists,
+  //     "Length:",
+  //     length
+  //   );
+  //   await browser.close();
+  //   throw err;
+  // }
 
   const trackpoints = await page.evaluate(() =>
     window.gLatLngArray.map((p) => ({
