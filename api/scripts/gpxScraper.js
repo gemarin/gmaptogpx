@@ -1,5 +1,7 @@
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
+import fs from "fs";
+import path from "path";
 
 puppeteer.use(StealthPlugin());
 
@@ -16,6 +18,7 @@ export async function scrapeGPX(routeNumber) {
       "--no-zygote",
     ],
   });
+
   const page = await browser.newPage();
 
   await page.setUserAgent(
@@ -35,48 +38,51 @@ export async function scrapeGPX(routeNumber) {
 
   await page.goto(url, { waitUntil: "networkidle2" });
 
-  // --- DEBUG: check every frame ---
-  for (const frame of page.frames()) {
-    try {
-      const hasKey = await frame.evaluate(
-        () => typeof window.gLatLngArray !== "undefined"
-      );
-      console.log(`🔎 Frame: ${frame.url()} -> gLatLngArray? ${hasKey}`);
-    } catch (e) {
-      console.log(`⚠️ Frame: ${frame.url()} -> error checking`, e.message);
-    }
-  }
-
-  // Find the frame that actually contains gLatLngArray
+  // 🔎 Debug: check all frames for gLatLngArray
+  console.log("🔎 Checking frames for gLatLngArray...");
   let targetFrame = null;
   for (const frame of page.frames()) {
     try {
       const hasKey = await frame.evaluate(
         () => typeof window.gLatLngArray !== "undefined"
       );
-      if (hasKey) {
-        targetFrame = frame;
-        break;
-      }
+      console.log(`🔎 Frame: ${frame.url()} -> gLatLngArray? ${hasKey}`);
+      if (hasKey && !targetFrame) targetFrame = frame;
     } catch {
-      // ignore inaccessible frames
+      console.log(`⚠️ Frame ${frame.url()} threw during check`);
     }
   }
 
   if (!targetFrame) {
-    // dump some HTML for debugging
-    const body = await page.evaluate(() =>
-      document.body.innerHTML.slice(0, 500)
+    console.error("❌ Could not find gLatLngArray in any frame");
+
+    // Dump a slice of main page body for debugging
+    const bodyHtml = await page.evaluate(() => document.body.innerHTML);
+    const debugDir = path.resolve("./debug");
+    if (!fs.existsSync(debugDir)) fs.mkdirSync(debugDir);
+    const timestamp = Date.now();
+    const htmlPath = path.join(
+      debugDir,
+      `body_${routeNumber}_${timestamp}.html`
     );
-    console.error("❌ Could not find gLatLngArray in any frame.");
-    console.error("🔎 First 500 chars of body:\n", body);
+    const screenshotPath = path.join(
+      debugDir,
+      `screenshot_${routeNumber}_${timestamp}.png`
+    );
+
+    fs.writeFileSync(htmlPath, bodyHtml);
+    await page.screenshot({ path: screenshotPath, fullPage: true });
+
+    console.error(`📄 Body saved to ${htmlPath}`);
+    console.error(`📸 Screenshot saved to ${screenshotPath}`);
+
     await browser.close();
-    throw new Error("gLatLngArray not found");
+    throw new Error("gLatLngArray not found. See debug files.");
   }
 
   console.log("✅ Found frame with gLatLngArray:", targetFrame.url());
 
-  // --- wait for it to populate ---
+  // Wait until it has points
   await targetFrame.waitForFunction(
     () => window.gLatLngArray && window.gLatLngArray.length > 0,
     { timeout: 60000, polling: 1000 }
