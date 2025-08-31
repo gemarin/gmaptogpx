@@ -4,7 +4,7 @@ import StealthPlugin from "puppeteer-extra-plugin-stealth";
 puppeteer.use(StealthPlugin());
 
 export async function scrapeGPX(routeNumber) {
-  const url = `https://www.gmap-pedometer.com/?r=${routeNumber}`;
+  const url = new URL(`https://www.gmap-pedometer.com/?r=${routeNumber}`);
   const browser = await puppeteer.launch({
     headless: "new",
     args: [
@@ -33,26 +33,55 @@ export async function scrapeGPX(routeNumber) {
     Object.defineProperty(navigator, "plugins", { get: () => [1, 2, 3, 4, 5] });
   });
 
-  await page.goto(url, { waitUntil: "domcontentloaded" });
+  await page.goto(url, { waitUntil: "networkidle2" });
 
-  // Find the right frame that contains gLatLngArray
-  const targetFrame = page
-    .frames()
-    .find((f) => f.url().includes(`gmap-pedometer.com/?r=${routeNumber}`));
-
-  if (!targetFrame) {
-    throw new Error("❌ Could not find gmap-pedometer route frame");
+  // --- DEBUG: check every frame ---
+  for (const frame of page.frames()) {
+    try {
+      const hasKey = await frame.evaluate(
+        () => typeof window.gLatLngArray !== "undefined"
+      );
+      console.log(`🔎 Frame: ${frame.url()} -> gLatLngArray? ${hasKey}`);
+    } catch (e) {
+      console.log(`⚠️ Frame: ${frame.url()} -> error checking`, e.message);
+    }
   }
 
-  // Wait until gLatLngArray is populated
+  // Find the frame that actually contains gLatLngArray
+  let targetFrame = null;
+  for (const frame of page.frames()) {
+    try {
+      const hasKey = await frame.evaluate(
+        () => typeof window.gLatLngArray !== "undefined"
+      );
+      if (hasKey) {
+        targetFrame = frame;
+        break;
+      }
+    } catch {
+      // ignore inaccessible frames
+    }
+  }
+
+  if (!targetFrame) {
+    // dump some HTML for debugging
+    const body = await page.evaluate(() =>
+      document.body.innerHTML.slice(0, 500)
+    );
+    console.error("❌ Could not find gLatLngArray in any frame.");
+    console.error("🔎 First 500 chars of body:\n", body);
+    await browser.close();
+    throw new Error("gLatLngArray not found");
+  }
+
+  console.log("✅ Found frame with gLatLngArray:", targetFrame.url());
+
+  // --- wait for it to populate ---
   await targetFrame.waitForFunction(
-    () =>
-      typeof window.gLatLngArray !== "undefined" &&
-      window.gLatLngArray.length > 0,
-    { timeout: 60000, polling: 500 }
+    () => window.gLatLngArray && window.gLatLngArray.length > 0,
+    { timeout: 60000, polling: 1000 }
   );
 
-  // Extract trackpoints
   const trackpoints = await targetFrame.evaluate(() =>
     window.gLatLngArray.map((p) => ({
       lat: typeof p.lat === "function" ? p.lat() : p.lat,
@@ -62,6 +91,7 @@ export async function scrapeGPX(routeNumber) {
   );
 
   const gpx = generateGPX(routeNumber, trackpoints);
+
   await browser.close();
   return gpx;
 }
