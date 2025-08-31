@@ -39,6 +39,9 @@ export async function scrapeGPX(routeNumber) {
     await new Promise((r) => setTimeout(r, 2000)); // wait 2s
   }
 
+  const keys = await page.evaluate(() => Object.keys(window));
+  console.error("Window keys:", keys);
+
   page.on("console", (msg) => console.log("📜 BROWSER:", msg.text()));
 
   // then inside evaluate
