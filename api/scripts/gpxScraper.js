@@ -6,7 +6,7 @@ import path from "path";
 puppeteer.use(StealthPlugin());
 
 export async function scrapeGPX(routeNumber) {
-  const url = new URL(`https://www.gmap-pedometer.com/?r=${routeNumber}`);
+  const url = new URL(`http://www.gmap-pedometer.com/?r=${routeNumber}`);
   const browser = await puppeteer.launch({
     headless: "new",
     args: [
